@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
           : 'bg-slate-900 border-slate-800 text-slate-100 shadow-lg'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3 md:gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 md:py-0 md:h-16 flex flex-wrap md:flex-nowrap items-center justify-between gap-x-3 gap-y-2 md:gap-6">
         
         {/* Zone 1: Brand title */}
         <div className="flex items-center gap-2.5 whitespace-nowrap shrink-0">
@@ -68,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Bookmark className="w-4 h-4 fill-current opacity-70" />
           </div>
           <span
-            className={`text-base sm:text-lg font-bold tracking-tight hidden xs:inline ${
+            className={`text-base sm:text-lg font-bold tracking-tight ${
               isLight ? 'text-stone-900' : 'text-white'
             }`}
           >
@@ -77,7 +77,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Zone 2: The 4 Core Category Mode Buttons */}
-        <nav className="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1">
+        <nav className="order-last md:order-none w-full md:w-auto grid grid-cols-3 md:flex items-center gap-1 sm:gap-2 py-1">
           {categories.map((cat) => {
             const isActive = currentCategory === cat.id;
             return (
@@ -87,7 +87,7 @@ export const Header: React.FC<HeaderProps> = ({
                   sound.playClick();
                   onSelectCategory(cat.id);
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
+                className={`px-2 md:px-3 py-2 md:py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap flex items-center justify-center gap-1.5 ${
                   isActive
                     ? 'bg-amber-500 text-slate-950 shadow font-bold'
                     : isLight
@@ -95,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                 }`}
               >
-                {cat.icon}
+                <span className="hidden sm:inline">{cat.icon}</span>
                 <span>{cat.label[lang]}</span>
               </button>
             );
