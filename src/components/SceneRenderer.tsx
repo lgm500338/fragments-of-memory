@@ -32,6 +32,8 @@ interface SceneRendererProps {
   timeOfDay?: 'morning' | 'sunset' | 'night';
   revealOk?: boolean;
   coverTitle?: string;
+  stripLeft?: React.ReactNode;
+  stripRight?: React.ReactNode;
 }
 
 export const SceneRenderer: React.FC<SceneRendererProps> = ({
@@ -52,6 +54,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   timeOfDay = 'morning',
   revealOk,
   coverTitle,
+  stripLeft,
+  stripRight,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoverCoords, setHoverCoords] = useState<{ x: number; y: number } | null>(null);
@@ -149,10 +153,12 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           <>
             <CoverArt type={illustrationType} title={coverTitle} levelNumber={levelNumber} />
             {/* 모바일: 얇은 띠 위에 제목 */}
-            <div className="sm:hidden absolute inset-0 flex items-center justify-center bg-black/25">
-              <span className="text-white font-bold text-sm drop-shadow" style={{ fontFamily: '"Gowun Batang","Noto Serif KR",serif' }}>
+            <div className="sm:hidden absolute inset-0 flex items-center justify-between gap-2 px-2.5 bg-black/25">
+              <span className="shrink-0">{stripLeft}</span>
+              <span className="min-w-0 truncate text-white font-bold text-sm drop-shadow" style={{ fontFamily: '"Gowun Batang","Noto Serif KR",serif' }}>
                 {coverTitle || ''}
               </span>
+              <span className="shrink-0">{stripRight}</span>
             </div>
           </>
         ) : (

@@ -88,10 +88,8 @@ export const QuestionPanel: React.FC<QuestionPanelProps> = ({
   // Step 3: Full sentence ('프랑스 작가 생택쥐페리의 어린왕자')
   const originalChunk = question.originalText?.[lang] || '';
   const narrativeText = fullNarrative || originalChunk;
-  const targetSentence =
-    stepNumber === 3 && narrativeText
-      ? narrativeText
-      : originalChunk || narrativeText;
+  // 외울 문구에는 작가·작품명을 넣지 않음 (헷갈림 방지)
+  const targetSentence = originalChunk || narrativeText;
 
   // Reset memorize state when changing question
   useEffect(() => {

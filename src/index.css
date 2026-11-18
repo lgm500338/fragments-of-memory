@@ -1,1 +1,31 @@
 @import "tailwindcss";
+
+/* 결과 창: 칭찬 글자 폭죽 */
+.fw-char {
+  display: inline-block;
+  opacity: 0;
+  animation: fwPop 0.7s cubic-bezier(.2, 1.6, .4, 1) forwards, fwGlow 1.6s ease-in-out infinite;
+}
+@keyframes fwPop {
+  0% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.2) rotate(var(--r)); color: #fde68a; }
+  60% { opacity: 1; transform: translate(0, -8px) scale(1.35); color: #fbbf24; }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes fwGlow {
+  0%, 100% { text-shadow: 0 0 0 rgba(251, 191, 36, 0); transform: none; }
+  50% { text-shadow: 0 0 14px rgba(251, 191, 36, .9); transform: translateY(-3px); }
+}
+.fw-sparks { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.fw-sparks i {
+  position: absolute; left: -3px; top: -3px; width: 6px; height: 6px; border-radius: 50%;
+  opacity: 0; animation: fwSpark 1.1s ease-out forwards;
+}
+@keyframes fwSpark {
+  0% { opacity: 1; transform: translate(0, 0) scale(1.4); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(.3); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fw-char { animation: none; opacity: 1; }
+  .fw-sparks { display: none; }
+}

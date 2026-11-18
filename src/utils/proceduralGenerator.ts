@@ -427,8 +427,8 @@ export function generateDynamicLevel(category: CategoryType, levelNumber: number
             en: `[Step 3: Complete] Combine both parts to finish the complete quote!`,
           },
           originalText: {
-            ko: `${quoteData.textKo} - ${quoteData.author}`,
-            en: `${quoteData.textEn} - ${quoteData.enAuthor}`,
+            ko: quoteData.textKo,
+            en: quoteData.textEn,
           },
           keyWords: quoteData.keywords,
           explanation: {

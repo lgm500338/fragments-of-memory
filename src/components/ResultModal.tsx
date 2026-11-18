@@ -33,6 +33,20 @@ const EN_COMPLIMENTS = [
   'The fragments of memory came together beautifully! 📖',
 ];
 
+// 폭죽 불꽃 (두 번 터짐)
+const SPARK_COLORS = ['#fbbf24', '#f472b6', '#60a5fa', '#34d399', '#f87171', '#a78bfa', '#fde68a'];
+const SPARKS = Array.from({ length: 36 }, (_, i) => {
+  const burst = i < 18 ? 0 : 1;
+  const a = ((i % 18) / 18) * Math.PI * 2 + burst * 0.17;
+  const dist = 90 + (i % 3) * 22;
+  return {
+    x: Math.round(Math.cos(a) * dist + (burst ? 40 : -40)),
+    y: Math.round(Math.sin(a) * dist * 0.7),
+    c: SPARK_COLORS[i % SPARK_COLORS.length],
+    d: burst ? 650 : 50,
+  };
+});
+
 export const ResultModal: React.FC<ResultModalProps> = ({
   level,
   results,
@@ -66,21 +80,48 @@ export const ResultModal: React.FC<ResultModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 select-none">
       <div className="w-full max-w-md bg-slate-900 border border-slate-700/80 rounded-2xl p-6 sm:p-7 shadow-2xl animate-in fade-in zoom-in-95 duration-200 text-center">
-        {/* Top Badge Icon */}
+        {/* 통과: 칭찬 글자가 폭죽처럼 터지며 나타남 / 실패: 다시 도전 아이콘 */}
         <div className="flex flex-col items-center">
-          <div
-            className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg mb-3 ${
-              isPassed
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 animate-bounce'
-                : 'bg-slate-800 text-slate-400 border border-slate-700'
-            }`}
-          >
-            {isPassed ? <Bookmark className="w-8 h-8 fill-amber-400" /> : <RotateCcw className="w-8 h-8" />}
-          </div>
-
-          <h2 className="text-xl sm:text-2xl font-black text-white flex items-center justify-center gap-1.5 flex-wrap">
-            <span>{isPassed ? compliment : lang === 'ko' ? '조금 더 주의 깊게 관찰해 보세요' : 'Try Observing Once More'}</span>
-          </h2>
+          {isPassed ? (
+            <div className="relative py-4 w-full" aria-label={compliment}>
+              <div className="fw-sparks" aria-hidden="true">
+                {SPARKS.map((sp, i) => (
+                  <i
+                    key={i}
+                    style={{ '--x': `${sp.x}px`, '--y': `${sp.y}px`, background: sp.c, animationDelay: `${sp.d}ms` } as React.CSSProperties}
+                  />
+                ))}
+              </div>
+              <h2 className="relative text-xl sm:text-2xl font-black text-white leading-snug break-keep" aria-hidden="true">
+                {Array.from(compliment).map((ch, i, arr) => {
+                  const a = (i / Math.max(1, arr.length - 1)) * Math.PI * 2;
+                  return (
+                    <span
+                      key={i}
+                      className="fw-char"
+                      style={{
+                        '--dx': `${Math.cos(a) * 60}px`,
+                        '--dy': `${Math.sin(a) * 40 + 20}px`,
+                        '--r': `${(i % 2 ? 1 : -1) * 90}deg`,
+                        animationDelay: `${120 + i * 45}ms, ${900 + i * 45}ms`,
+                      } as React.CSSProperties}
+                    >
+                      {ch === ' ' ? '\u00a0' : ch}
+                    </span>
+                  );
+                })}
+              </h2>
+            </div>
+          ) : (
+            <>
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg mb-3 bg-slate-800 text-slate-400 border border-slate-700">
+                <RotateCcw className="w-8 h-8" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-white">
+                {lang === 'ko' ? '조금 더 주의 깊게 관찰해 보세요' : 'Try Observing Once More'}
+              </h2>
+            </>
+          )}
           <p className="text-xs text-amber-300/80 mt-1.5 font-medium">
             {level.title[lang]}
           </p>
