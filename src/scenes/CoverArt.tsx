@@ -28,8 +28,8 @@ function stars(n: number, seed: number, maxY: number, x0 = 0, w = 400, y0 = 0) {
   return out;
 }
 
-// 별이 빛나는 동화의 밤 (어린 왕자·피터 팬·피노키오)
-const nightTale = `
+// 별이 빛나는 동화의 밤
+const nightBase = `
 <defs><linearGradient id="cvN" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1236"/><stop offset=".6" stop-color="#2b3a78"/><stop offset="1" stop-color="#6a5a8e"/></linearGradient>
 <linearGradient id="cvDune1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c79a6a"/><stop offset="1" stop-color="#8a6446"/></linearGradient>
 <linearGradient id="cvDune2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9c7452"/><stop offset="1" stop-color="#5e4232"/></linearGradient></defs>
@@ -38,9 +38,7 @@ ${stars(70, 7, 200)}
 <g stroke="#fff" stroke-linecap="round"><line x1="60" y1="40" x2="110" y2="62" stroke-width="1.6" opacity=".8"/><line x1="60" y1="40" x2="140" y2="76" stroke-width=".6" opacity=".35"/></g>
 <circle cx="300" cy="78" r="44" fill="#fff3c4" opacity=".08"/>
 <circle cx="300" cy="78" r="26" fill="#fbf1c8"/><circle cx="312" cy="70" r="23" fill="#24306a"/>
-<g transform="translate(110 118)"><circle r="22" fill="#d9b07a"/><circle r="22" fill="url(#cvVig)"/><ellipse cx="-6" cy="-8" rx="8" ry="5" fill="#fff" opacity=".2"/>
-  <path d="M-2 -22 q-1 -12 2 -18" stroke="#3f7a55" stroke-width="1.6" fill="none"/><path d="M0 -40 q-6 -3 -4 -8 q4 -1 4 3 q0 -4 4 -3 q2 5 -4 8z" fill="#e0475e"/></g>
-<path d="M0 230 Q90 196 190 222 T400 210 V300 H0Z" fill="url(#cvDune1)"/>
+__MID__<path d="M0 230 Q90 196 190 222 T400 210 V300 H0Z" fill="url(#cvDune1)"/>
 <path d="M0 262 Q120 236 230 258 T400 250 V300 H0Z" fill="url(#cvDune2)"/>
 <path d="M30 232 q60 -18 120 -6" stroke="#f1d1a0" stroke-width="1.5" fill="none" opacity=".5"/>
 <g transform="translate(300 236)"><rect x="-4" y="-2" width="8" height="10" fill="#5a3a24"/>
@@ -117,10 +115,23 @@ const parchment = `
 <g transform="translate(70 270)"><path d="M-14 0 h28 v-14 q0 -6 -6 -6 h-16 q-6 0 -6 6z" fill="#1f1f2a"/><ellipse cx="0" cy="-20" rx="8" ry="2" fill="#333"/></g>
 <g fill="#ffe7a0">${[[60, 60], [150, 40], [230, 80], [100, 96], [370, 200], [20, 140]].map(([x, y]) => `<path d="M${x} ${y - 5} L${x + 1.5} ${y - 1.5} L${x + 5} ${y} L${x + 1.5} ${y + 1.5} L${x} ${y + 5} L${x - 1.5} ${y + 1.5} L${x - 5} ${y} L${x - 1.5} ${y - 1.5}Z" opacity=".7"/>`).join('')}</g>`;
 
+const PLANET = `<g transform="translate(110 118)"><circle r="22" fill="#d9b07a"/><circle r="22" fill="url(#cvVig)"/><ellipse cx="-6" cy="-8" rx="8" ry="5" fill="#fff" opacity=".2"/>
+  <path d="M-2 -22 q-1 -12 2 -18" stroke="#3f7a55" stroke-width="1.6" fill="none"/><path d="M0 -40 q-6 -3 -4 -8 q4 -1 4 3 q0 -4 4 -3 q2 5 -4 8z" fill="#e0475e"/></g>`;
+const COTTAGE = `<g transform="translate(96 214)">
+  <ellipse cx="0" cy="4" rx="54" ry="6" fill="#000" opacity=".25"/>
+  <rect x="-34" y="-34" width="68" height="38" fill="#b98a5e"/><path d="M-42 -32 L0 -66 L42 -32Z" fill="#7a4c2a"/>
+  <rect x="18" y="-62" width="10" height="20" fill="#6e4526"/><path d="M23 -66 q6 -10 0 -18 q8 6 4 16" stroke="#cfd6e8" stroke-width="2" fill="none" opacity=".5"/>
+  <rect x="-24" y="-22" width="16" height="14" fill="#ffd27a"/><rect x="6" y="-24" width="14" height="28" fill="#5a3518"/>
+  <circle cx="-16" cy="-15" r="22" fill="url(#cvGlow)" opacity=".7"/>
+  <path d="M-24 -15 h16 M-16 -22 v14" stroke="#7a4c2a" stroke-width="1.5"/></g>
+  <g fill="#2f4a3a"><path d="M180 222 l12 -40 l12 40z"/><path d="M200 226 l10 -32 l10 32z"/></g>`;
+const nightPrince = nightBase.replace('__MID__', PLANET);
+const nightCottage = nightBase.replace('__MID__', '').replace('<path d="M0 262', COTTAGE + '<path d="M0 262');
+
 const ART: Record<string, string> = {
-  little_prince: nightTale,
-  fairytale_cottage: nightTale,
-  observatory_altar: nightTale,
+  little_prince: nightPrince,
+  fairytale_cottage: nightCottage,
+  observatory_altar: nightCottage,
   fairytale_meadow: meadow,
   savannah_wild: meadow,
   fruit_storage: meadow,

@@ -28,14 +28,18 @@ export function splitSentence(text: string): SentenceSplit {
     };
   }
 
-  // 2. If contains comma or semicolon
-  if (clean.includes(',')) {
-    const idx = clean.indexOf(',');
-    return {
-      part1: clean.slice(0, idx + 1).trim(),
-      part2: clean.slice(idx + 1).trim(),
-      full: clean,
-    };
+  // 2. 쉼표·마침표·물음표·느낌표 중 가운데에 가장 가까운 곳에서 나누기 (너무 한쪽으로 치우치면 건너뜀)
+  const half = clean.length / 2;
+  let best = -1;
+  const re = /[,.?!…](?=\s)/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(clean))) {
+    const pos = m.index + 1;
+    if (pos < clean.length * 0.25 || pos > clean.length * 0.75) continue;
+    if (best < 0 || Math.abs(pos - half) < Math.abs(best - half)) best = pos;
+  }
+  if (best > 0) {
+    return { part1: clean.slice(0, best).trim(), part2: clean.slice(best).trim(), full: clean };
   }
 
   // 3. Otherwise split by words at roughly half point

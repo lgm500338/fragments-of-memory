@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { CATEGORY_LEVELS } from './data/categoryLevels';
 import { generateDynamicLevel } from './utils/proceduralGenerator';
 import { generatePictureLevel } from './scenes/generatePicture';
+import { ALL_WORKS, generateTaleLevel, sequenceFor } from './data/taleGenerator';
+import { WorkPicker } from './components/WorkPicker';
 import { CategoryType, GamePhase, Language, LevelData, PlayerStats, QuestionResult } from './types/puzzle';
 import { sound } from './utils/audio';
 import { Header } from './components/Header';
@@ -42,6 +44,28 @@ export default function App() {
   const [currentLevelIndex, setCurrentLevelIndex] = useState<number>(0);
   const [isMuted, setIsMuted] = useState<boolean>(false);
 
+  // 기억동화·소설: 고른 작품과 작품별 진행
+  const [selectedWork, setSelectedWork] = useState<string>(() => {
+    try {
+      return localStorage.getItem('fragments_selected_work') || ALL_WORKS;
+    } catch {
+      return ALL_WORKS;
+    }
+  });
+  const [workProgress, setWorkProgress] = useState<Record<string, number>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('fragments_work_progress') || '{}');
+    } catch {
+      return {};
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem('fragments_selected_work', selectedWork);
+      localStorage.setItem('fragments_work_progress', JSON.stringify(workProgress));
+    } catch {}
+  }, [selectedWork, workProgress]);
+
   // Player Stats with localStorage persistence
   const [playerStats, setPlayerStats] = useState<PlayerStats>(() => {
     try {
@@ -80,10 +104,12 @@ export default function App() {
     () =>
       currentCategory === 'picture'
         ? generatePictureLevel(currentLevelIndex + 1)
+        : currentCategory === 'tale_novel'
+        ? generateTaleLevel(currentLevelIndex + 1, selectedWork, lang)
         : currentLevelIndex < baseLevels.length
         ? baseLevels[currentLevelIndex]
         : generateDynamicLevel(currentCategory, currentLevelIndex + 1),
-    [currentCategory, currentLevelIndex, baseLevels]
+    [currentCategory, currentLevelIndex, baseLevels, selectedWork, lang]
   );
 
   // Game Phases & State
@@ -134,7 +160,16 @@ export default function App() {
 
   useEffect(() => {
     startLevel(currentLevel);
-  }, [currentCategory, currentLevelIndex]);
+  }, [currentCategory, currentLevelIndex, selectedWork]);
+
+  // 단계 선택 칸: 기억동화·소설은 작품별 진행
+  const taleSeqLen = useMemo(() => sequenceFor(selectedWork, lang).length, [selectedWork, lang]);
+  const selectorLevels: LevelData[] =
+    currentCategory === 'tale_novel' ? new Array(taleSeqLen).fill(currentLevel) : currentCategory === 'picture' ? [] : baseLevels;
+  const highestUnlocked =
+    currentCategory === 'tale_novel'
+      ? workProgress[selectedWork] || 0
+      : playerStats.unlockedProgress[currentCategory] || 0;
 
   // Observation Timer countdown (if timed)
   useEffect(() => {
@@ -304,6 +339,13 @@ export default function App() {
         },
       }));
 
+      if (currentCategory === 'tale_novel') {
+        setWorkProgress((prev) => ({
+          ...prev,
+          [selectedWork]: Math.max(prev[selectedWork] || 0, currentLevelIndex + 1),
+        }));
+      }
+
       setBookmarksEarned(earned);
       setShowResultModal(true);
     }
@@ -364,6 +406,19 @@ export default function App() {
 
       {/* Main Workspace */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        {currentCategory === 'tale_novel' && (
+          <WorkPicker
+            selected={selectedWork}
+            onSelect={(id) => {
+              setSelectedWork(id);
+              setCurrentLevelIndex(Math.min(workProgress[id] || 0, 100000));
+            }}
+            progress={workProgress}
+            lang={lang}
+            isLight={isLight}
+          />
+        )}
+
         {/* Level Indicator & Action Bar */}
         <div
           className={`flex items-center justify-between pb-3 border-b flex-wrap gap-3 ${
@@ -509,6 +564,7 @@ export default function App() {
                 lang={lang}
                 compact={true}
                 isLight={isLight}
+                coverTitle={currentLevel.title[lang].split(':')[0]}
               />
             </div>
 
@@ -550,9 +606,10 @@ export default function App() {
           }`}
         >
           <LevelSelector
-            levels={baseLevels}
+            key={`${currentCategory}-${selectedWork}`}
+            levels={selectorLevels}
             currentLevelIndex={currentLevelIndex}
-            highestUnlockedLevel={playerStats.unlockedProgress[currentCategory] || 0}
+            highestUnlockedLevel={highestUnlocked}
             onSelectLevel={(idx) => setCurrentLevelIndex(idx)}
             lang={lang}
             isLight={isLight}

@@ -1,0 +1,255 @@
+// 기억동화·소설 작품 서재
+// - 모두 저작권이 끝난 작품. 번역문은 이 앱을 위해 새로 옮긴 것.
+// - koOnly: 한국에서는 저작권이 끝났지만 미국·유럽에서는 아직 남아 있는 작품 → 한국어판에서만 보임.
+// - 한국 고전은 원문(위키문헌 판본 기준) 그대로.
+// - 문장은 이야기 순서대로.
+
+export type WorkGroup = 'tale' | 'novel' | 'korean';
+
+export interface Work {
+  id: string;
+  group: WorkGroup;
+  ko: string;
+  en: string;
+  authorKo: string;
+  authorEn: string;
+  cover: string; // CoverArt 종류
+  koOnly?: boolean;
+  lines: { ko: string; en?: string }[];
+}
+
+export const GROUP_LABEL: Record<WorkGroup, { ko: string; en: string }> = {
+  tale: { ko: '동화', en: 'Fairy Tales' },
+  novel: { ko: '세계 소설', en: 'World Novels' },
+  korean: { ko: '한국 고전', en: 'Korean Classics' },
+};
+
+export const WORKS: Work[] = [
+  // ───────── 동화 (쉬움) ─────────
+  {
+    id: 'snow-white',
+    group: 'tale',
+    ko: '백설공주',
+    en: 'Snow White',
+    authorKo: '그림 형제',
+    authorEn: 'Brothers Grimm',
+    cover: 'fairytale_cottage',
+    lines: [
+      { ko: '한겨울, 눈송이가 깃털처럼 하늘에서 내리고 있었어요.', en: 'In the middle of winter, snowflakes were falling like feathers from the sky.' },
+      { ko: '왕비는 흑단 창틀 곁에 앉아 바느질을 하고 있었어요.', en: 'The queen sat sewing at a window with a frame of ebony.' },
+      { ko: '바늘에 손가락을 찔리자 눈 위에 피 세 방울이 떨어졌어요.', en: 'She pricked her finger, and three drops of blood fell upon the snow.' },
+      { ko: '왕비는 눈처럼 희고 피처럼 붉고 흑단처럼 검은 아이를 바랐어요.', en: 'She wished for a child as white as snow, as red as blood, and as black as ebony.' },
+      { ko: '거울아, 벽에 걸린 거울아, 이 나라에서 누가 제일 아름답니?', en: 'Mirror, mirror on the wall, who in this land is fairest of all?' },
+      { ko: '백설공주는 숲속을 달리다가 작은 오두막을 발견했어요.', en: 'Snow White ran through the forest and found a little cottage.' },
+      { ko: '식탁 위에는 작은 접시 일곱 개와 작은 잔 일곱 개가 놓여 있었어요.', en: 'On the table were seven little plates and seven little cups.' },
+      { ko: '난쟁이들은 날마다 산에 가서 광석과 금을 캤어요.', en: 'Every day the dwarfs went into the mountains to dig for ore and gold.' },
+      { ko: '왕비는 늙은 장사꾼으로 변장하고 일곱 산을 넘어갔어요.', en: 'The queen disguised herself as an old peddler and crossed the seven mountains.' },
+      { ko: '사과의 한쪽은 하얗고 다른 한쪽은 빨갰어요.', en: 'One half of the apple was white and the other half was red.' },
+      { ko: '난쟁이들은 백설공주를 유리관에 눕히고 금빛 글씨로 이름을 새겼어요.', en: 'The dwarfs laid Snow White in a glass coffin and wrote her name on it in golden letters.' },
+      { ko: '관이 흔들리자 목에 걸렸던 독 사과 조각이 튀어나왔어요.', en: 'When the coffin was jolted, the piece of poisoned apple fell out of her throat.' },
+    ],
+  },
+  {
+    id: 'hansel-gretel',
+    group: 'tale',
+    ko: '헨젤과 그레텔',
+    en: 'Hansel and Gretel',
+    authorKo: '그림 형제',
+    authorEn: 'Brothers Grimm',
+    cover: 'fairytale_meadow',
+    lines: [
+      { ko: '큰 숲 가장자리에 가난한 나무꾼이 두 아이와 함께 살았어요.', en: 'Near a great forest lived a poor woodcutter with his two children.' },
+      { ko: '헨젤은 달빛에 반짝이는 하얀 조약돌을 주머니에 가득 담았어요.', en: 'Hansel filled his pockets with white pebbles that shone in the moonlight.' },
+      { ko: '조약돌은 새 은화처럼 반짝이며 집으로 가는 길을 알려 주었어요.', en: 'The pebbles glittered like new silver coins and showed them the way home.' },
+      { ko: '두 번째 날, 헨젤은 빵 부스러기를 길에 떨어뜨렸어요.', en: 'The second time, Hansel dropped crumbs of bread along the path.' },
+      { ko: '하지만 숲과 들을 날아다니는 새들이 부스러기를 모두 쪼아 먹었어요.', en: 'But the birds of the woods and fields had pecked them all up.' },
+      { ko: '아이들은 빵으로 짓고 과자로 지붕을 덮은 작은 집을 발견했어요.', en: 'The children found a little house built of bread and roofed with cake.' },
+      { ko: '창문은 투명한 설탕으로 만들어져 있었어요.', en: 'The windows were made of clear sugar.' },
+      { ko: '조금씩, 조금씩, 누가 내 집을 갉아 먹고 있니?', en: 'Nibble, nibble, little mouse, who is nibbling at my house?' },
+      { ko: '헨젤은 마녀에게 손가락 대신 작은 뼈다귀를 내밀었어요.', en: 'Hansel held out a little bone instead of his finger.' },
+      { ko: '그레텔은 마녀를 화덕 안으로 힘껏 밀고 쇠문을 닫았어요.', en: 'Gretel pushed the witch into the oven with all her might and shut the iron door.' },
+      { ko: '아이들은 마녀의 집에서 진주와 보석이 가득한 상자를 찾았어요.', en: "In the witch's house the children found chests full of pearls and jewels." },
+      { ko: '하얀 오리가 두 아이를 한 명씩 태워 넓은 물을 건너 주었어요.', en: 'A white duck carried the children across the wide water one at a time.' },
+    ],
+  },
+  {
+    id: 'alice',
+    group: 'tale',
+    ko: '이상한 나라의 앨리스',
+    en: "Alice's Adventures in Wonderland",
+    authorKo: '루이스 캐럴',
+    authorEn: 'Lewis Carroll',
+    cover: 'fairytale_meadow',
+    lines: [
+      { ko: '앨리스는 언니 곁에 앉아 아무것도 하지 않는 게 몹시 지루해지기 시작했어요.', en: 'Alice was beginning to get very tired of sitting by her sister on the bank.' },
+      { ko: '그림도 대화도 없는 책이 무슨 소용이람?', en: 'What is the use of a book without pictures or conversations?' },
+      { ko: '이런, 이런! 늦겠어!', en: 'Oh dear! Oh dear! I shall be late!' },
+      { ko: '토끼가 정말로 조끼 주머니에서 회중시계를 꺼냈어요.', en: 'The Rabbit actually took a watch out of its waistcoat-pocket.' },
+      { ko: '아래로, 아래로, 아래로. 이렇게 끝없이 떨어지는 걸까?', en: 'Down, down, down. Would the fall never come to an end?' },
+      { ko: '병에는 나를 마셔요라고 적힌 종이 꼬리표가 붙어 있었어요.', en: 'The bottle had a paper label with the words DRINK ME on it.' },
+      { ko: '점점 더 이상해지네! 앨리스가 소리쳤어요.', en: 'Curiouser and curiouser! cried Alice.' },
+      { ko: '너는 누구니? 애벌레가 물었어요.', en: 'Who are you? said the Caterpillar.' },
+      { ko: '여기서 어느 길로 가야 하는지 알려 줄래?', en: 'Would you tell me, please, which way I ought to go from here?' },
+      { ko: '그건 네가 어디로 가고 싶은지에 달렸지.', en: 'That depends a good deal on where you want to get to.' },
+      { ko: '웃음 없는 고양이는 자주 봤지만, 고양이 없는 웃음이라니!', en: "I've often seen a cat without a grin, but a grin without a cat!" },
+      { ko: '저 아이의 목을 쳐라!', en: 'Off with her head!' },
+      { ko: '너희는 그냥 카드 한 벌일 뿐이야!', en: "You're nothing but a pack of cards!" },
+    ],
+  },
+  {
+    id: 'little-prince',
+    group: 'tale',
+    ko: '어린 왕자',
+    en: 'The Little Prince',
+    authorKo: '앙투안 드 생텍쥐페리',
+    authorEn: 'Antoine de Saint-Exupéry',
+    cover: 'little_prince',
+    koOnly: true,
+    lines: [
+      { ko: '여섯 살 때 나는 원시림에 관한 책에서 멋진 그림 하나를 보았다.' },
+      { ko: '어른들은 혼자서는 아무것도 이해하지 못해서, 아이들은 늘 설명해 주느라 지친다.' },
+      { ko: '부탁이야, 양 한 마리만 그려 줘.' },
+      { ko: '이건 상자야. 네가 갖고 싶은 양은 이 안에 있어.' },
+      { ko: '어린 왕자가 사는 별은 집 한 채보다 조금 클 뿐이었다.' },
+      { ko: '나는 해가 지는 걸 마흔네 번이나 본 적도 있어!' },
+      { ko: '꽃들이 하는 말을 들으면 안 돼. 그냥 바라보고 향기를 맡아야 해.' },
+      { ko: '나는 그 꽃을 말이 아니라 행동으로 판단했어야 했어.' },
+      { ko: '넌 아직 나에게 수많은 다른 아이들과 똑같은 한 아이일 뿐이야.' },
+      { ko: '네가 오후 네 시에 온다면, 나는 세 시부터 행복해지기 시작할 거야.' },
+      { ko: '마음으로 보아야 잘 보여. 가장 중요한 것은 눈에 보이지 않아.' },
+      { ko: '네 장미를 그토록 소중하게 만든 건 네가 장미에게 쏟은 시간이야.' },
+      { ko: '사막이 아름다운 건 어딘가에 우물을 숨기고 있기 때문이야.' },
+    ],
+  },
+
+  // ───────── 세계 소설 (보통~어려움) ─────────
+  {
+    id: 'gatsby',
+    group: 'novel',
+    ko: '위대한 개츠비',
+    en: 'The Great Gatsby',
+    authorKo: 'F. 스콧 피츠제럴드',
+    authorEn: 'F. Scott Fitzgerald',
+    cover: 'classic_study',
+    lines: [
+      { ko: '내가 더 어리고 쉽게 상처받던 시절, 아버지는 내게 한 가지 충고를 해 주셨다.', en: 'In my younger and more vulnerable years my father gave me some advice.' },
+      { ko: '누군가를 비판하고 싶어질 때면, 세상 모든 사람이 너만큼 좋은 조건을 누리지는 못했다는 걸 기억하렴.', en: "Whenever you feel like criticizing any one, just remember that all the people in this world haven't had the advantages that you've had." },
+      { ko: '여름밤 내내 이웃집에서는 음악 소리가 흘러나왔다.', en: "There was music from my neighbor's house through the summer nights." },
+      { ko: '그의 푸른 정원에서는 속삭임과 샴페인과 별빛 사이로 사람들이 나방처럼 오갔다.', en: 'In his blue gardens men and girls came and went like moths among the whisperings and the champagne and the stars.' },
+      { ko: '그는 이상한 몸짓으로 어두운 바다를 향해 두 팔을 뻗었다.', en: 'He stretched out his arms toward the dark water in a curious way.' },
+      { ko: '아주 작고 멀리 떨어진 초록 불빛 하나 말고는 아무것도 보이지 않았다.', en: 'I distinguished nothing except a single green light, minute and far away.' },
+      { ko: '그녀의 목소리에는 돈이 가득해, 그가 불쑥 말했다.', en: 'Her voice is full of money, he said suddenly.' },
+      { ko: '과거를 되풀이할 수 없다고? 물론 할 수 있지!', en: "Can't repeat the past? Why of course you can!" },
+      { ko: '개츠비는 초록 불빛을, 해마다 우리 앞에서 멀어져 가는 황홀한 미래를 믿었다.', en: 'Gatsby believed in the green light, the orgastic future that year by year recedes before us.' },
+      { ko: '그렇게 우리는 물결을 거스르는 배처럼, 쉼 없이 과거로 떠밀리면서도 노를 저어 간다.', en: 'So we beat on, boats against the current, borne back ceaselessly into the past.' },
+    ],
+  },
+  {
+    id: 'war-and-peace',
+    group: 'novel',
+    ko: '전쟁과 평화',
+    en: 'War and Peace',
+    authorKo: '레프 톨스토이',
+    authorEn: 'Leo Tolstoy',
+    cover: 'classic_study',
+    lines: [
+      { ko: '자, 공작님, 제노바와 루카는 이제 보나파르트 집안의 영지에 지나지 않아요.', en: 'Well, Prince, Genoa and Lucca are now no more than family estates of the Bonapartes.' },
+      { ko: '어떻게 나는 전에 이 높은 하늘을 보지 못했을까?', en: 'How is it I never saw this lofty sky before?' },
+      { ko: '그래! 이 끝없는 하늘 말고는 모든 것이 헛되고 모든 것이 거짓이다.', en: 'Yes! All is vanity, all is deception, except this infinite sky.' },
+      { ko: '이렇게 무릎을 꼭 끌어안고 웅크리면, 그대로 날아오를 것만 같아!', en: "If I just crouched down like this and hugged my knees tight, I'd fly away!" },
+      { ko: '길가에는 늙은 참나무 한 그루가 서 있었다.', en: 'By the side of the road stood an old oak tree.' },
+      { ko: '아니, 서른한 살에 인생이 끝난 것은 아니다.', en: 'No, life is not over at thirty-one.' },
+      { ko: '인내와 시간, 이 두 용사보다 강한 것은 없다.', en: 'There are no warriors stronger than these two: patience and time.' },
+      { ko: '겨울밤 하늘 높이 1812년의 거대한 혜성이 빛나고 있었다.', en: 'High in the winter night sky shone the great comet of 1812.' },
+      { ko: '이 모든 것이 내 것이고, 이 모든 것이 내 안에 있으며, 이 모든 것이 바로 나다!', en: 'All of this is mine, all of this is within me, and all of this is me!' },
+      { ko: '삶이 있는 한 행복도 있다.', en: 'As long as there is life, there is happiness.' },
+    ],
+  },
+  {
+    id: 'demian',
+    group: 'novel',
+    ko: '데미안',
+    en: 'Demian',
+    authorKo: '헤르만 헤세',
+    authorEn: 'Hermann Hesse',
+    cover: 'quote_parchment',
+    koOnly: true,
+    lines: [
+      { ko: '나는 오직 내 안에서 스스로 솟아 나오려는 것을 살아 보려 했을 뿐이다.' },
+      { ko: '그것이 왜 그토록 어려웠을까?' },
+      { ko: '모든 사람의 삶은 자기 자신에게로 가는 길이다.' },
+      { ko: '그곳에서는 두 세계가 뒤섞여 있었고, 낮과 밤이 서로 다른 극에서 왔다.' },
+      { ko: '우리가 어떤 사람을 미워한다면, 그의 모습 속에서 우리 안에 있는 무언가를 미워하는 것이다.' },
+      { ko: '우리 안에 없는 것은 우리를 흔들지 못한다.' },
+      { ko: '새는 알에서 나오려고 싸운다. 알은 세계다.' },
+      { ko: '태어나려는 자는 하나의 세계를 깨뜨려야 한다.' },
+      { ko: '새는 신에게로 날아간다. 그 신의 이름은 아브락사스다.' },
+      { ko: '깨어난 사람에게는 단 하나의 의무밖에 없다. 자기 자신을 찾는 것이다.' },
+    ],
+  },
+  {
+    id: 'old-man-sea',
+    group: 'novel',
+    ko: '노인과 바다',
+    en: 'The Old Man and the Sea',
+    authorKo: '어니스트 헤밍웨이',
+    authorEn: 'Ernest Hemingway',
+    cover: 'fairytale_cottage',
+    koOnly: true,
+    lines: [
+      { ko: '그는 멕시코 만류에서 조각배를 타고 홀로 고기를 잡는 노인이었다.' },
+      { ko: '그는 벌써 팔십사 일 동안 고기를 한 마리도 잡지 못했다.' },
+      { ko: '노인의 눈만은 바다와 같은 빛깔이었고, 쾌활하며 지칠 줄 몰랐다.' },
+      { ko: '고기야, 나는 너를 무척 사랑하고 존경한다.' },
+      { ko: '하지만 오늘이 가기 전에 너를 잡고야 말 테다.' },
+      { ko: '지금은 가지지 못한 것을 생각할 때가 아니다.' },
+      { ko: '희망을 버리는 건 어리석은 일이야.' },
+      { ko: '인간은 파멸할 수는 있어도 패배하지는 않는다.' },
+      { ko: '노인은 사자 꿈을 꾸고 있었다.' },
+    ],
+  },
+
+  // ───────── 한국 고전 (어려움, 원문) ─────────
+  {
+    id: 'lucky-day',
+    group: 'korean',
+    ko: '운수 좋은 날',
+    en: 'A Lucky Day',
+    authorKo: '현진건',
+    authorEn: 'Hyun Jin-geon',
+    cover: 'classic_study',
+    koOnly: true,
+    lines: [
+      { ko: '새침하게 흐린 품이 눈이 올 듯하더니 눈은 아니 오고 얼다가 만 비가 추적추적 내리었다.' },
+      { ko: '이날이야말로 동소문 안에서 인력거꾼 노릇을 하는 김 첨지에게는 오래간만에도 닥친 운수 좋은 날이었다.' },
+      { ko: '첫번에 삼십 전, 둘째 번에 오십 전, 아침 댓바람에 그리 흔치 않은 일이었다.' },
+      { ko: '더구나 이날 이때에 이 팔십 전이라는 돈이 그에게 얼마나 유용한지 몰랐다.' },
+      { ko: '컬컬한 목에 모주 한 잔도 적실 수 있거니와 그보다도 앓는 아내에게 설렁탕 한 그릇도 사다줄 수 있음이다.' },
+      { ko: '그의 아내가 기침으로 쿨럭거리기는 벌써 달포가 넘었다.' },
+      { ko: '조밥도 굶기를 먹다시피 하는 형편이니 물론 약 한 첩 써 본 일이 없다.' },
+      { ko: '설렁탕을 사다 놓았는데 왜 먹지를 못하니, 왜 먹지를 못하니.' },
+      { ko: '괴상하게도 오늘은! 운수가, 좋더니만.' },
+    ],
+  },
+  {
+    id: 'buckwheat',
+    group: 'korean',
+    ko: '메밀꽃 필 무렵',
+    en: 'When the Buckwheat Blooms',
+    authorKo: '이효석',
+    authorEn: 'Lee Hyo-seok',
+    cover: 'fairytale_cottage',
+    koOnly: true,
+    lines: [
+      { ko: '춥춥스럽게 날아드는 파리 떼도 장난꾼 각다귀들도 귀치않다.' },
+      { ko: '얼금뱅이요 왼손잡이인 드팀전의 허 생원은 기어코 동업의 조 선달에게 나꾸어 보았다.' },
+      { ko: '오늘 밤은 밤을 새서 걸어야 될걸? 달이 뜨렷다?' },
+      { ko: '무명 필과 주단 바리가 두 고리짝에 꼭 찼다.' },
+      { ko: '멍석 위에는 천 조각이 어수선하게 남았다.' },
+      { ko: '내일은 진부와 대화에 장이 선다.' },
+      { ko: '길은 지금 긴 산허리에 걸려 있다.' },
+      { ko: '산허리는 온통 메밀밭이어서 피기 시작한 꽃이 소금을 뿌린 듯이 흐뭇한 달빛에 숨이 막힐 지경이다.' },
+      { ko: '붉은 대궁이 향기같이 애잔하고 나귀들의 걸음도 시원하다.' },
+    ],
+  },
+];

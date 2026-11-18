@@ -293,4 +293,24 @@ export const OBJECTS: Record<string, SceneObject> = {
     <path d="M-22 -6 H22" stroke="#cfe8b4" stroke-width="2"/>
     <g fill="#2a1a0e"><ellipse cx="-8" cy="-14" rx="1.5" ry="2.3"/><ellipse cx="2" cy="-20" rx="1.5" ry="2.3"/><ellipse cx="9" cy="-12" rx="1.5" ry="2.3"/><ellipse cx="-2" cy="-10" rx="1.5" ry="2.3"/></g>`,
   },
+  seagull: {
+    ko: '갈매기', en: 'Seagull', types: ['sand', 'surface'],
+    svg: `
+    <path d="M-2 -2 v-8 M4 -2 v-8" stroke="#e8a33a" stroke-width="2"/>
+    <ellipse cx="0" cy="-20" rx="15" ry="10" fill="#fbfbf6"/>
+    <path d="M-12 -22 Q2 -30 16 -20 Q4 -16 -12 -22Z" fill="#9aa4ad"/>
+    <path d="M14 -20 l8 4 l-8 2z" fill="#2a2a2a"/>
+    <circle cx="-10" cy="-32" r="8" fill="#fbfbf6"/>
+    <circle cx="-12" cy="-33" r="1.6" fill="#222"/>
+    <path d="M-18 -32 l-9 2 l9 2z" fill="#f2c230"/>`,
+  },
+  sunscreen: {
+    ko: '선크림 통', en: 'Sunscreen Bottle', types: ['sand', 'towel'],
+    svg: `
+    <rect x="-10" y="-40" width="20" height="40" rx="5" fill="#f8d548"/>
+    <rect x="-10" y="-40" width="20" height="40" rx="5" fill="url(#gGlass)"/>
+    <rect x="-6" y="-48" width="12" height="9" rx="2" fill="#e07b2a"/>
+    <circle cx="0" cy="-22" r="6" fill="#e07b2a"/>
+    <g stroke="#e07b2a" stroke-width="1.5"><path d="M0 -32 v-3 M0 -12 v3 M-10 -22 h3 M10 -22 h-3"/></g>`,
+  },
 };

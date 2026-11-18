@@ -41,7 +41,7 @@ export function generatePictureLevel(levelNumber: number): LevelData {
   const tod = TODS[Math.floor((levelNumber - 1) / SCENES.length) % TODS.length];
 
   // 난이도: 레벨이 오를수록 물건은 많아지고 관찰 시간은 짧아짐
-  const wantCount = Math.min(10, 5 + Math.floor((levelNumber - 1) / 3));
+  const wantCount = Math.min(15, 5 + Math.floor((levelNumber - 1) / 3));
   const observeSec = Math.max(7, 14 - Math.floor((levelNumber - 1) / 4));
 
   const usable = scene.objects.filter((k) => OBJECTS[k] && scene.slots.some((s) => OBJECTS[k].types.includes(s.t)));
@@ -57,7 +57,7 @@ export function generatePictureLevel(levelNumber: number): LevelData {
     const si = freeSlots.find((i) => {
       if (used.has(i) || !OBJECTS[k].types.includes(scene.slots[i].t)) return false;
       const s = scene.slots[i];
-      return placed.every((p) => Math.hypot(scene.slots[p.si].x - s.x, scene.slots[p.si].y - s.y) > 70);
+      return placed.every((p) => Math.hypot(scene.slots[p.si].x - s.x, scene.slots[p.si].y - s.y) >= 60);
     });
     if (si === undefined) continue;
     used.add(si);
