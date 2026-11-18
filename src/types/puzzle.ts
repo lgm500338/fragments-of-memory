@@ -72,6 +72,7 @@ export interface LevelData {
   observationTimeLimit: number; // seconds, 0 = untimed
   difficultyTier: 'easy' | 'normal' | 'hard';
   items?: SceneItem[]; // only for picture mode
+  tierKey?: string; // 쉬움·보통·어려움…
   sceneId?: string;
   timeOfDay?: 'morning' | 'sunset' | 'night';
   questions: Question[];

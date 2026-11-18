@@ -4,6 +4,8 @@ import { generateDynamicLevel } from './utils/proceduralGenerator';
 import { generatePictureLevel } from './scenes/generatePicture';
 import { ALL_WORKS, generateTaleLevel, sequenceFor } from './data/taleGenerator';
 import { WorkPicker } from './components/WorkPicker';
+import { TierSelector } from './components/TierSelector';
+import { PICTURE_TIERS, TALE_PASS, taleTiers } from './data/tiers';
 import { CategoryType, GamePhase, Language, LevelData, PlayerStats, QuestionResult } from './types/puzzle';
 import { sound } from './utils/audio';
 import { Header } from './components/Header';
@@ -41,7 +43,14 @@ export default function App() {
   });
 
   const [currentCategory, setCurrentCategory] = useState<CategoryType>('tale_novel');
-  const [currentLevelIndex, setCurrentLevelIndex] = useState<number>(0);
+  const [currentLevelIndex, setCurrentLevelIndex] = useState<number>(() => {
+    try {
+      const w = localStorage.getItem('fragments_selected_work') || 'all';
+      return JSON.parse(localStorage.getItem('fragments_work_progress') || '{}')[w] || 0;
+    } catch {
+      return 0;
+    }
+  });
   const [isMuted, setIsMuted] = useState<boolean>(false);
 
   // 기억동화·소설: 고른 작품과 작품별 진행
@@ -230,6 +239,15 @@ export default function App() {
     sound.playHintUsed();
   };
 
+  // 문장 통과선: 단계가 높을수록 올라감 (명언 탭은 기본 70%)
+  const passPercent =
+    currentCategory === 'tale_novel' ? TALE_PASS[currentLevel.tierKey || ''] ?? PASS_PERCENT : PASS_PERCENT;
+
+  // 판 통과 조건: 기억 그림은 한 문제까지만 틀려도 됨
+  const needCorrect =
+    currentCategory === 'picture' ? Math.max(1, currentLevel.questions.length - 1) : 0;
+  const levelPassed = levelResults.filter((r) => r.isCorrect).length >= needCorrect;
+
   // Submit Answer
   const handleSubmitAnswer = () => {
     if (!activeQuestion) return;
@@ -267,7 +285,7 @@ export default function App() {
         const origText = activeQuestion.originalText?.[lang] || '';
         const fullStory = currentLevel.storyNarrative?.[lang] || '';
         matchPercentage = computeTextSimilarity(userTypedText, origText, fullStory);
-        isCorrect = matchPercentage >= PASS_PERCENT;
+        isCorrect = matchPercentage >= passPercent;
         if (isCorrect) awardedPoints = activeQuestion.points;
         break;
       }
@@ -323,23 +341,26 @@ export default function App() {
       setActiveHint(null);
       setPhase('RECALL');
     } else {
-      // Completed all 3 steps of this episode!
-      const earned = 1; // Exactly 1 bookmark reward per episode
+      // 판 끝: 통과했을 때만 다음 판이 열리고 책갈피를 받음
+      const passed = levelResults.filter((r) => r.isCorrect).length >= needCorrect;
+      const earned = passed ? 1 : 0;
 
-      setPlayerStats((prev) => ({
-        ...prev,
-        bookmarks: prev.bookmarks + earned,
-        levelsCompleted: prev.levelsCompleted + 1,
-        unlockedProgress: {
-          ...prev.unlockedProgress,
-          [currentCategory]: Math.max(
-            prev.unlockedProgress[currentCategory] || 0,
-            currentLevelIndex + 1
-          ),
-        },
-      }));
+      if (passed) {
+        setPlayerStats((prev) => ({
+          ...prev,
+          bookmarks: prev.bookmarks + earned,
+          levelsCompleted: prev.levelsCompleted + 1,
+          unlockedProgress: {
+            ...prev.unlockedProgress,
+            [currentCategory]: Math.max(
+              prev.unlockedProgress[currentCategory] || 0,
+              currentLevelIndex + 1
+            ),
+          },
+        }));
+      }
 
-      if (currentCategory === 'tale_novel') {
+      if (passed && currentCategory === 'tale_novel') {
         setWorkProgress((prev) => ({
           ...prev,
           [selectedWork]: Math.max(prev[selectedWork] || 0, currentLevelIndex + 1),
@@ -381,7 +402,10 @@ export default function App() {
         onSelectCategory={(cat) => {
           sound.playClick();
           setCurrentCategory(cat);
-          setCurrentLevelIndex(0);
+          // 하던 곳부터 이어서
+          setCurrentLevelIndex(
+            cat === 'tale_novel' ? workProgress[selectedWork] || 0 : playerStats.unlockedProgress[cat] || 0
+          );
           setPhase(cat === 'picture' ? 'OBSERVATION' : 'RECALL');
           setActiveQuestionIdx(0);
           setUserPin(null);
@@ -564,7 +588,7 @@ export default function App() {
                 lang={lang}
                 compact={true}
                 isLight={isLight}
-                coverTitle={currentLevel.title[lang].split(':')[0]}
+                coverTitle={currentCategory === 'tale_novel' ? currentLevel.title[lang].split(':').slice(1).join(':').trim() : undefined}
               />
             </div>
 
@@ -605,15 +629,27 @@ export default function App() {
             isLight ? 'border-stone-200' : 'border-slate-800'
           }`}
         >
-          <LevelSelector
-            key={`${currentCategory}-${selectedWork}`}
-            levels={selectorLevels}
-            currentLevelIndex={currentLevelIndex}
-            highestUnlockedLevel={highestUnlocked}
-            onSelectLevel={(idx) => setCurrentLevelIndex(idx)}
-            lang={lang}
-            isLight={isLight}
-          />
+          {currentCategory === 'quote' ? (
+            <LevelSelector
+              key={currentCategory}
+              levels={selectorLevels}
+              currentLevelIndex={currentLevelIndex}
+              highestUnlockedLevel={highestUnlocked}
+              onSelectLevel={(idx) => setCurrentLevelIndex(idx)}
+              lang={lang}
+              isLight={isLight}
+            />
+          ) : (
+            <TierSelector
+              key={`${currentCategory}-${selectedWork}-${lang}`}
+              tiers={currentCategory === 'picture' ? PICTURE_TIERS : taleTiers(selectedWork, lang)}
+              currentIndex={currentLevelIndex}
+              cleared={highestUnlocked}
+              onSelect={(idx) => setCurrentLevelIndex(idx)}
+              lang={lang}
+              isLight={isLight}
+            />
+          )}
         </div>
       </main>
 
@@ -633,6 +669,8 @@ export default function App() {
           level={currentLevel}
           results={levelResults}
           onNextLevel={handleProceedNextLevel}
+          passed={levelPassed}
+          needCorrect={needCorrect}
           onRetryLevel={handleRetryCurrentLevel}
           bookmarksEarned={bookmarksEarned}
           totalBookmarks={playerStats.bookmarks}

@@ -2,6 +2,7 @@
 import { LevelData, Question, SceneItem } from '../types/puzzle';
 import { OBJECTS } from './objects';
 import { SCENES, TimeOfDay, TOD_LABEL } from './scenes';
+import { PICTURE_RULES, PICTURE_TIERS, stageLabel, tierAt } from '../data/tiers';
 
 function rng(seed: number) {
   let a = seed >>> 0;
@@ -32,17 +33,20 @@ function josa(word: string, withF: string, withoutF: string) {
 
 const TODS: TimeOfDay[] = ['morning', 'sunset', 'night'];
 
-// 핀이 정답으로 인정되는 거리 (가로 % 기준, 그림 800px 중 약 64px)
-export const PIN_RADIUS = 8;
 
 export function generatePictureLevel(levelNumber: number): LevelData {
   const r = rng(levelNumber * 7919 + 17);
   const scene = SCENES[(levelNumber - 1) % SCENES.length];
   const tod = TODS[Math.floor((levelNumber - 1) / SCENES.length) % TODS.length];
 
-  // 난이도: 레벨이 오를수록 물건은 많아지고 관찰 시간은 짧아짐
-  const wantCount = Math.min(15, 5 + Math.floor((levelNumber - 1) / 3));
-  const observeSec = Math.max(7, 14 - Math.floor((levelNumber - 1) / 4));
+  // 난이도: 단계(쉬움~전설)에 따라 물건 수·관찰 시간·문제 수·정답 범위가 정해짐
+  const pos = tierAt(PICTURE_TIERS, levelNumber - 1);
+  const rule = PICTURE_RULES[pos.tier.key];
+  const span = rule.objs[1] - rule.objs[0] + 1;
+  const tierLen = Number.isFinite(pos.tier.count) ? pos.tier.count : 1;
+  const wantCount = Math.min(rule.objs[1], rule.objs[0] + Math.floor((pos.stage * span) / tierLen));
+  const observeSec = rule.time;
+  const qCount = pos.tier.key === 'legend' && pos.stage >= 30 ? 6 : rule.questions;
 
   const usable = scene.objects.filter((k) => OBJECTS[k] && scene.slots.some((s) => OBJECTS[k].types.includes(s.t)));
   const keys = shuffle(usable, r);
@@ -79,14 +83,14 @@ export function generatePictureLevel(levelNumber: number): LevelData {
       description: { ko: o.ko, en: o.en },
       x: Math.round((s.x / 800) * 1000) / 10,
       y: Math.round((cy / 500) * 1000) / 10,
-      radius: PIN_RADIUS,
+      radius: rule.radius,
       count: 1,
       iconType: key,
       zoneName: { ko: s.ko, en: s.en },
     };
   });
 
-  // 문제 3개: 위치 찾기 2개 + "그림에 없던 물건" 1개 (레벨 1~2는 위치 찾기만)
+  // 문제: 위치 찾기 여러 개 + "그림에 없던 물건" 1개 (쉬움 단계는 위치 찾기만)
   const targets = shuffle(items, r);
   const pinQ = (it: SceneItem, n: number): Question => ({
     id: `pic-${levelNumber}-q${n}`,
@@ -103,18 +107,21 @@ export function generatePictureLevel(levelNumber: number): LevelData {
     points: 100,
   });
 
-  const questions: Question[] = [pinQ(targets[0], 1), pinQ(targets[1], 2)];
+  const withChoice = pos.tier.key !== 'easy';
+  const pinCount = Math.min(targets.length, withChoice ? qCount - 1 : qCount);
+  const questions: Question[] = targets.slice(0, pinCount).map((it, i) => pinQ(it, i + 1));
 
   const absentPool = shuffle(
     usable.filter((k) => !items.some((it) => it.id === k)),
     r
   );
-  if (levelNumber >= 3 && absentPool.length > 0) {
+  if (withChoice && absentPool.length > 0) {
     const shown = shuffle(items, r).slice(0, 3).map((it) => it.objKey as string);
     const absent = absentPool[0];
     const opts = shuffle([...shown, absent], r);
-    questions.push({
-      id: `pic-${levelNumber}-q3`,
+    // 객관식은 중간쯤에 끼워 넣기
+    questions.splice(Math.floor(questions.length / 2), 0, {
+      id: `pic-${levelNumber}-mc`,
       type: 'multiple_choice',
       prompt: { ko: '그림에 없었던 물건은 무엇일까요?', en: 'Which object was NOT in the picture?' },
       options: opts.map((k) => ({ ko: OBJECTS[k].ko, en: OBJECTS[k].en })),
@@ -125,8 +132,6 @@ export function generatePictureLevel(levelNumber: number): LevelData {
       },
       points: 100,
     });
-  } else {
-    questions.push(pinQ(targets[2] || targets[0], 3));
   }
 
   const todL = TOD_LABEL[tod];
@@ -135,17 +140,18 @@ export function generatePictureLevel(levelNumber: number): LevelData {
     category: 'picture',
     levelNumber,
     title: {
-      ko: `탐험 제${levelNumber}장: ${scene.ko} · ${todL.ko}`,
-      en: `Expedition Ch. ${levelNumber}: ${scene.en} · ${todL.en}`,
+      ko: `${stageLabel(pos, 'ko')}: ${scene.ko} · ${todL.ko}`,
+      en: `${stageLabel(pos, 'en')}: ${scene.en} · ${todL.en}`,
     },
     subtitle: { ko: `물건 ${items.length}개 · 관찰 ${observeSec}초`, en: `${items.length} objects · ${observeSec}s` },
-    difficultyTier: levelNumber <= 5 ? 'easy' : levelNumber <= 15 ? 'normal' : 'hard',
+    difficultyTier: pos.tierIdx <= 1 ? 'easy' : pos.tierIdx <= 3 ? 'normal' : 'hard',
     observationTimeLimit: observeSec,
     storyNarrative: {
       ko: `이 그림에는 ${josa(items.map((it) => it.name.ko).join(', '), '이', '가')} 있어요. 어디에 있는지 잘 봐두세요.`,
       en: `In this picture: ${items.map((it) => it.name.en.toLowerCase()).join(', ')}. Watch where each one is.`,
     },
     illustrationType: 'fairytale_cottage',
+    tierKey: pos.tier.key,
     sceneId: scene.id,
     timeOfDay: tod,
     items,

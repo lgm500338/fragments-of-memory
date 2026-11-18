@@ -4,6 +4,7 @@
 import { Language, LevelData } from '../types/puzzle';
 import { splitSentence } from '../utils/sentenceSplitter';
 import { WORKS, Work, WorkGroup } from './works';
+import { stageLabel, taleTiers, tierAt } from './tiers';
 
 export const ALL_WORKS = 'all';
 const GROUP_ORDER: WorkGroup[] = ['tale', 'novel', 'korean'];
@@ -70,17 +71,19 @@ export function generateTaleLevel(levelNumber: number, workId: string, lang: Lan
   const sKo = splitSentence(text.ko);
   const sEn = splitSentence(text.en);
   const tier = work.group === 'tale' && !challenge ? 'easy' : work.group === 'korean' || challenge ? 'hard' : 'normal';
+  const pos = tierAt(taleTiers(workId, lang), levelNumber - 1);
   return {
     id: `tale-${workId}-${levelNumber}`,
     category: 'tale_novel',
     levelNumber,
     title: {
-      ko: `<${work.ko}> 제${levelNumber}화: ${challenge ? '두 문장 잇기' : '기억의 문장'}`,
-      en: `<${work.en}> Ep. ${levelNumber}: ${challenge ? 'Two Lines' : 'Memory Line'}`,
+      ko: `${stageLabel(pos, 'ko')}: <${work.ko}>${challenge ? ' 두 문장 잇기' : ''}`,
+      en: `${stageLabel(pos, 'en')}: <${work.en}>${challenge ? ' Two Lines' : ''}`,
     },
     subtitle: { ko: `${work.authorKo} 작`, en: `by ${work.authorEn}` },
     authorOrSource: { ko: work.authorKo, en: work.authorEn },
     difficultyTier: tier,
+    tierKey: pos.tier.key,
     observationTimeLimit: 0,
     storyNarrative: {
       ko: `${text.ko}\n\n- ${work.authorKo} <${work.ko}>`,

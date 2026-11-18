@@ -11,6 +11,8 @@ interface ResultModalProps {
   bookmarksEarned: number;
   totalBookmarks: number;
   lang: Language;
+  passed?: boolean;
+  needCorrect?: number;
 }
 
 const KO_COMPLIMENTS = [
@@ -39,11 +41,13 @@ export const ResultModal: React.FC<ResultModalProps> = ({
   bookmarksEarned,
   totalBookmarks,
   lang,
+  passed,
+  needCorrect = 0,
 }) => {
   const correctCount = results.filter((r) => r.isCorrect).length;
   const totalQuestions = results.length;
   const accuracyRate = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
-  const isPassed = accuracyRate >= 65;
+  const isPassed = passed ?? accuracyRate >= 65;
 
   // Pick an encouraging compliment based on level number
   const complimentIndex = (level.levelNumber + results.length) % KO_COMPLIMENTS.length;
@@ -123,8 +127,8 @@ export const ResultModal: React.FC<ResultModalProps> = ({
         ) : (
           <div className="p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 text-slate-400 text-xs mb-6">
             {lang === 'ko'
-              ? '정답률 65% 이상을 달성하면 소중한 책갈피를 얻을 수 있습니다.'
-              : 'Achieve 65%+ accuracy to earn a precious bookmark.'}
+              ? `${totalQuestions}문제 중 ${needCorrect}문제 이상 맞혀야 다음 판이 열려요. 다시 도전해 보세요!`
+              : `Get at least ${needCorrect} of ${totalQuestions} right to unlock the next stage.`}
           </div>
         )}
 
@@ -141,6 +145,7 @@ export const ResultModal: React.FC<ResultModalProps> = ({
             <span>{lang === 'ko' ? '다시 도전' : 'Retry'}</span>
           </button>
 
+          {isPassed && (
           <button
             onClick={() => {
               sound.playClick();
@@ -148,9 +153,10 @@ export const ResultModal: React.FC<ResultModalProps> = ({
             }}
             className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
           >
-            <span>{lang === 'ko' ? '다음 단계로' : 'Next Stage'}</span>
+            <span>{lang === 'ko' ? '다음 판으로' : 'Next Stage'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
+          )}
         </div>
       </div>
     </div>
