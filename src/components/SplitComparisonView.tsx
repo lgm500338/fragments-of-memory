@@ -25,7 +25,7 @@ export const SplitComparisonView: React.FC<SplitComparisonViewProps> = ({
   lang,
   isLight,
 }) => {
-  const isPassed = matchPercentage >= 65;
+  const isPassed = matchPercentage >= 70;
   const normalizedUser = normalizeKoreanText(userText);
 
   return (
@@ -85,7 +85,7 @@ export const SplitComparisonView: React.FC<SplitComparisonViewProps> = ({
             className={`text-base sm:text-lg font-bold font-mono tabular-nums ${
               matchPercentage >= 90
                 ? 'text-emerald-500'
-                : matchPercentage >= 65
+                : matchPercentage >= 70
                 ? 'text-amber-500'
                 : 'text-rose-500'
             }`}

@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { CATEGORY_LEVELS } from './data/categoryLevels';
 import { generateDynamicLevel } from './utils/proceduralGenerator';
+import { generatePictureLevel } from './scenes/generatePicture';
 import { CategoryType, GamePhase, Language, LevelData, PlayerStats, QuestionResult } from './types/puzzle';
 import { sound } from './utils/audio';
 import { Header } from './components/Header';
@@ -12,6 +13,9 @@ import { ResultModal } from './components/ResultModal';
 import { LevelSelector } from './components/LevelSelector';
 import { RotateCcw } from 'lucide-react';
 import { computeTextSimilarity } from './utils/textComparison';
+
+// 문장 따라 쓰기 통과선 (%)
+const PASS_PERCENT = 70;
 
 const INITIAL_STATS: PlayerStats = {
   bookmarks: 3, // Welcome gift of 3 bookmarks
@@ -72,10 +76,15 @@ export default function App() {
     CATEGORY_LEVELS.tale_novel ||
     CATEGORY_LEVELS[Object.keys(CATEGORY_LEVELS)[0]];
 
-  const currentLevel: LevelData =
-    currentLevelIndex < baseLevels.length
-      ? baseLevels[currentLevelIndex]
-      : generateDynamicLevel(currentCategory, currentLevelIndex + 1);
+  const currentLevel: LevelData = useMemo(
+    () =>
+      currentCategory === 'picture'
+        ? generatePictureLevel(currentLevelIndex + 1)
+        : currentLevelIndex < baseLevels.length
+        ? baseLevels[currentLevelIndex]
+        : generateDynamicLevel(currentCategory, currentLevelIndex + 1),
+    [currentCategory, currentLevelIndex, baseLevels]
+  );
 
   // Game Phases & State
   const [phase, setPhase] = useState<GamePhase>('OBSERVATION');
@@ -198,8 +207,9 @@ export default function App() {
     switch (activeQuestion.type) {
       case 'pin_location': {
         if (!userPin || !targetItem) break;
+        // 그림은 가로 16 : 세로 10 이라 세로 %를 가로 % 길이로 맞춰서 잰다
         const dx = userPin.x - targetItem.x;
-        const dy = userPin.y - targetItem.y;
+        const dy = (userPin.y - targetItem.y) * (10 / 16);
         distanceError = Math.sqrt(dx * dx + dy * dy);
         isCorrect = distanceError <= targetItem.radius;
         if (isCorrect) awardedPoints = activeQuestion.points;
@@ -222,7 +232,7 @@ export default function App() {
         const origText = activeQuestion.originalText?.[lang] || '';
         const fullStory = currentLevel.storyNarrative?.[lang] || '';
         matchPercentage = computeTextSimilarity(userTypedText, origText, fullStory);
-        isCorrect = matchPercentage >= 60;
+        isCorrect = matchPercentage >= PASS_PERCENT;
         if (isCorrect) awardedPoints = activeQuestion.points;
         break;
       }
@@ -246,7 +256,7 @@ export default function App() {
 
     const questionResult: QuestionResult = {
       questionId: activeQuestion.id,
-      isCorrect: true,
+      isCorrect,
       scoreAwarded: awardedPoints,
       userSelection:
         activeQuestion.type === 'pin_location'
@@ -434,6 +444,9 @@ export default function App() {
                 lang={lang}
                 compact={false}
                 isLight={isLight}
+                sceneId={currentLevel.sceneId}
+                timeOfDay={currentLevel.timeOfDay}
+                revealOk={currentQuestionResult?.isCorrect}
               />
             </div>
 

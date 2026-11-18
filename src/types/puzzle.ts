@@ -20,6 +20,11 @@ export interface SceneItem {
   iconType: string;
   color?: string;
   zoneName: { ko: string; en: string };
+  // SVG 장면용 (기억 그림)
+  objKey?: string;
+  px?: number; // 그림 좌표 (800x500 기준, 물건 바닥)
+  py?: number;
+  scale?: number;
 }
 
 export interface Question {
@@ -67,6 +72,8 @@ export interface LevelData {
   observationTimeLimit: number; // seconds, 0 = untimed
   difficultyTier: 'easy' | 'normal' | 'hard';
   items?: SceneItem[]; // only for picture mode
+  sceneId?: string;
+  timeOfDay?: 'morning' | 'sunset' | 'night';
   questions: Question[];
 }
 

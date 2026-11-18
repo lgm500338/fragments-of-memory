@@ -429,13 +429,13 @@ export const QuestionPanel: React.FC<QuestionPanelProps> = ({
                     {userPin ? (
                       <span className="text-amber-600 dark:text-amber-300 font-semibold">
                         {lang === 'ko'
-                          ? `위치 좌표 (X: ${userPin.x}%, Y: ${userPin.y}%) 지정 완료. [답안 제출]을 누르세요.`
-                          : `Pin dropped. Click Submit.`}
+                          ? '핀을 꽂았어요. 바꾸려면 다른 곳을 누르고, 맞으면 [답안 제출]을 누르세요.'
+                          : 'Pin dropped. Tap elsewhere to move it, or Submit.'}
                       </span>
                     ) : (
                       <span>
                         {lang === 'ko'
-                          ? '화면에서 사물이 원래 있던 위치를 클릭하여 핀을 꽂으세요.'
+                          ? '그림에서 그 물건이 있던 자리를 눌러 핀을 꽂으세요.'
                           : 'Click on the scene above to drop your pin.'}
                       </span>
                     )}
@@ -470,6 +470,29 @@ export const QuestionPanel: React.FC<QuestionPanelProps> = ({
                       </button>
                     );
                   })}
+                </div>
+              )}
+
+              {/* 정답 확인 (기억 그림) */}
+              {isAnswered && result && (
+                <div
+                  className={`p-4 rounded-xl border-2 space-y-1.5 ${
+                    result.isCorrect
+                      ? isLight ? 'bg-emerald-50 border-emerald-300' : 'bg-emerald-950/40 border-emerald-600/60'
+                      : isLight ? 'bg-amber-50 border-amber-300' : 'bg-amber-950/30 border-amber-600/60'
+                  }`}
+                >
+                  <p className={`text-base font-extrabold ${result.isCorrect ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-700 dark:text-amber-300'}`}>
+                    {result.isCorrect
+                      ? lang === 'ko' ? '정답이에요! 🎉' : 'Correct! 🎉'
+                      : lang === 'ko' ? '아쉬워요!' : 'Not quite!'}
+                  </p>
+                  <p className={`text-sm ${isLight ? 'text-stone-700' : 'text-slate-300'}`}>
+                    {question.type === 'pin_location' && !result.isCorrect
+                      ? (lang === 'ko' ? '원래 자리는 그림의 동그라미 안이에요. ' : 'The real spot is inside the circle. ')
+                      : ''}
+                    {question.explanation[lang]}
+                  </p>
                 </div>
               )}
 
@@ -563,6 +586,10 @@ export const QuestionPanel: React.FC<QuestionPanelProps> = ({
                 ? lang === 'ko'
                   ? '🌟 이번 화 완료! 결과 확인'
                   : '🌟 Episode Complete! View Results'
+                : !isChunkedTextRecall
+                ? lang === 'ko'
+                  ? '다음 문제'
+                  : 'Next Question'
                 : stepNumber === 1
                 ? lang === 'ko'
                   ? '다음 2단계로 (뒷부분 기억하기) →'

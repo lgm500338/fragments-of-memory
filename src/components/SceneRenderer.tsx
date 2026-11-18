@@ -3,6 +3,8 @@ import { SceneItem, GamePhase, Question, Language, ArtStyle } from '../types/puz
 import { MapPin, CheckCircle, Sparkles, Eye } from 'lucide-react';
 import { ArtisticIllustration } from './ArtisticIllustration';
 import { sound } from '../utils/audio';
+import { PictureScene } from '../scenes/PictureScene';
+import { CoverArt } from '../scenes/CoverArt';
 
 interface SceneRendererProps {
   illustrationType:
@@ -26,6 +28,10 @@ interface SceneRendererProps {
   lang: Language;
   compact?: boolean;
   isLight?: boolean;
+  sceneId?: string;
+  timeOfDay?: 'morning' | 'sunset' | 'night';
+  revealOk?: boolean;
+  coverTitle?: string;
 }
 
 export const SceneRenderer: React.FC<SceneRendererProps> = ({
@@ -42,6 +48,10 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   lang,
   compact = false,
   isLight = true,
+  sceneId,
+  timeOfDay = 'morning',
+  revealOk,
+  coverTitle,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoverCoords, setHoverCoords] = useState<{ x: number; y: number } | null>(null);
@@ -72,6 +82,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   };
 
   const isPictureCanvas = items.length > 0;
+  const isSvgScene = !!sceneId && isPictureCanvas;
+  const showFeedback = phase === 'FEEDBACK' || showFeedbackResults;
 
   // Frame styling tailored to active art style
   const STYLE_CYCLE: ArtStyle[] = [
@@ -108,8 +120,8 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   return (
     <div
       className={`relative w-full rounded-2xl overflow-hidden select-none transition-all ${
-        compact ? 'max-w-[340px] aspect-[4/3] mx-auto' : 'aspect-[16/10] max-h-[460px]'
-      } ${getFrameClasses()} ${
+        compact ? 'max-w-[340px] aspect-[4/3] mx-auto' : isSvgScene ? 'aspect-[16/10] max-w-[760px] mx-auto' : 'aspect-[16/10] max-h-[460px]'
+      } ${isSvgScene ? 'border border-[#e4d9c6] shadow-[0_10px_30px_rgba(60,40,10,0.18)]' : getFrameClasses()} ${
         isLight ? 'bg-[#fbf9f4]' : 'bg-slate-950'
       }`}
     >
@@ -123,16 +135,30 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
         }`}
       >
         {/* Authentic Multi-Style Canvas Artwork */}
-        <ArtisticIllustration
-          type={illustrationType}
-          artStyle={artStyle}
-          levelNumber={levelNumber}
-          isLight={isLight}
-        />
+        {isSvgScene ? (
+          <PictureScene
+            sceneId={sceneId as string}
+            timeOfDay={timeOfDay}
+            items={items}
+            showItems={phase === 'OBSERVATION'}
+            revealItem={showFeedback && isPinQuestion ? targetItem : undefined}
+            revealOk={revealOk}
+            userPin={userPin}
+          />
+        ) : !isPictureCanvas ? (
+          <CoverArt type={illustrationType} title={coverTitle} levelNumber={levelNumber} />
+        ) : (
+          <ArtisticIllustration
+            type={illustrationType}
+            artStyle={artStyle}
+            levelNumber={levelNumber}
+            isLight={isLight}
+          />
+        )}
 
         {/* Observation Item Markers (Picture Mode Only) - Refined Non-Pictogram Callouts */}
         {phase === 'OBSERVATION' &&
-          isPictureCanvas &&
+          isPictureCanvas && !isSvgScene &&
           items.map((item, idx) => (
             <div
               key={item.id}
@@ -161,7 +187,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
           ))}
 
         {/* User Pin Drop */}
-        {phase === 'RECALL' && isPinQuestion && userPin && (
+        {(phase === 'RECALL' || (isSvgScene && showFeedback)) && isPinQuestion && userPin && (
           <div
             style={{
               left: `${userPin.x}%`,
@@ -170,12 +196,14 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
             }}
             className="absolute pointer-events-none flex flex-col items-center z-30"
           >
-            <div className="p-1 rounded-full bg-red-600 text-white shadow-xl animate-bounce">
-              <MapPin className="w-7 h-7 fill-red-600 stroke-white stroke-2" />
+            <div className={`${isSvgScene ? '' : 'p-1 rounded-full bg-red-600 shadow-xl animate-bounce'} text-white`}>
+              <MapPin className={`w-8 h-8 stroke-white stroke-2 drop-shadow-md ${isSvgScene && showFeedback ? (revealOk ? 'fill-emerald-600' : 'fill-red-600') : 'fill-red-600'}`} />
             </div>
-            <div className="text-[10px] bg-slate-950/90 text-white px-2 py-0.5 rounded border border-slate-700 whitespace-nowrap shadow mt-0.5">
-              {lang === 'ko' ? '지정한 위치' : 'Selected Location'}
-            </div>
+            {!isSvgScene && (
+              <div className="text-[10px] bg-slate-950/90 text-white px-2 py-0.5 rounded border border-slate-700 whitespace-nowrap shadow mt-0.5">
+                {lang === 'ko' ? '지정한 위치' : 'Selected Location'}
+              </div>
+            )}
           </div>
         )}
 
@@ -192,7 +220,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
         )}
 
         {/* Feedback Mode for Picture Mode */}
-        {(phase === 'FEEDBACK' || showFeedbackResults) && targetItem && (
+        {showFeedback && targetItem && !isSvgScene && (
           <>
             <div
               style={{
@@ -227,7 +255,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
         )}
 
         {/* Crosshair coordinates */}
-        {phase === 'RECALL' && isPinQuestion && hoverCoords && (
+        {phase === 'RECALL' && isPinQuestion && hoverCoords && !isSvgScene && (
           <div className="absolute bottom-2 left-2 pointer-events-none bg-slate-900/80 backdrop-blur text-slate-300 px-2.5 py-1 rounded text-xs border border-slate-700 font-mono tabular-nums">
             X {hoverCoords.x}% · Y {hoverCoords.y}%
           </div>
