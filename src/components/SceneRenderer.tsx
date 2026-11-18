@@ -120,7 +120,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
   return (
     <div
       className={`relative w-full rounded-2xl overflow-hidden select-none transition-all ${
-        compact ? 'max-w-[340px] aspect-[4/3] mx-auto' : isSvgScene ? 'aspect-[16/10] max-w-[760px] mx-auto' : 'aspect-[16/10] max-h-[460px]'
+        compact ? 'h-16 sm:h-auto sm:max-w-[340px] sm:aspect-[4/3] mx-auto' : isSvgScene ? 'aspect-[16/10] max-w-[760px] mx-auto' : 'aspect-[16/10] max-h-[460px]'
       } ${isSvgScene ? 'border border-[#e4d9c6] shadow-[0_10px_30px_rgba(60,40,10,0.18)]' : getFrameClasses()} ${
         isLight ? 'bg-[#fbf9f4]' : 'bg-slate-950'
       }`}
@@ -146,7 +146,15 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
             userPin={userPin}
           />
         ) : !isPictureCanvas ? (
-          <CoverArt type={illustrationType} title={coverTitle} levelNumber={levelNumber} />
+          <>
+            <CoverArt type={illustrationType} title={coverTitle} levelNumber={levelNumber} />
+            {/* 모바일: 얇은 띠 위에 제목 */}
+            <div className="sm:hidden absolute inset-0 flex items-center justify-center bg-black/25">
+              <span className="text-white font-bold text-sm drop-shadow" style={{ fontFamily: '"Gowun Batang","Noto Serif KR",serif' }}>
+                {coverTitle || ''}
+              </span>
+            </div>
+          </>
         ) : (
           <ArtisticIllustration
             type={illustrationType}

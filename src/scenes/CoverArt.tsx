@@ -148,8 +148,8 @@ export const CoverArt: React.FC<Props> = ({ type, title, levelNumber = 1 }) => {
       <g dangerouslySetInnerHTML={{ __html: art }} />
       <rect width="400" height="300" fill="url(#cvVig)" />
       <rect width="400" height="300" fill="#a08060" filter="url(#cvGrain)" />
-      <rect y="236" width="400" height="64" fill="url(#cvBand)" />
-      <text x="200" y="280" textAnchor="middle" fill="#fff8e6" fontSize="17" fontWeight="700" style={{ fontFamily: '"Gowun Batang","Noto Serif KR",serif', letterSpacing: '1px' }}>
+      <rect y="236" width="400" height="64" fill="url(#cvBand)" className="hidden sm:inline" />
+      <text className="hidden sm:inline" x="200" y="280" textAnchor="middle" fill="#fff8e6" fontSize="17" fontWeight="700" style={{ fontFamily: '"Gowun Batang","Noto Serif KR",serif', letterSpacing: '1px' }}>
         {label}
       </text>
     </svg>

@@ -207,7 +207,7 @@ export const QuestionPanel: React.FC<QuestionPanelProps> = ({
             {/* MOMENT 1: Eye Memorize Phase (!isMemorized) */}
             {!isMemorized && !isAnswered && (
               <div
-                className={`p-6 sm:p-7 rounded-2xl border-2 shadow-md text-center space-y-4 animate-in fade-in duration-200 ${
+                className={`p-4 sm:p-7 rounded-2xl border-2 shadow-md text-center space-y-3 sm:space-y-4 animate-in fade-in duration-200 ${
                   isLight
                     ? 'bg-amber-50/90 border-amber-300 text-stone-900'
                     : 'bg-amber-950/40 border-amber-500/50 text-amber-50'
@@ -225,28 +225,15 @@ export const QuestionPanel: React.FC<QuestionPanelProps> = ({
                 </div>
 
                 {/* Target Sentence in Large Serif Font */}
-                <div className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black tracking-wide text-stone-900 dark:text-amber-100 py-3 select-text">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black tracking-wide text-stone-900 dark:text-amber-100 py-1 sm:py-3 select-text break-keep">
                   “ {targetSentence} ”
                 </div>
 
                 <p className="text-xs text-stone-500 dark:text-slate-400">
                   {lang === 'ko'
-                    ? '머릿속에 새긴 후 아래 버튼을 누르면 문구가 가려집니다.'
-                    : 'Once memorized, click the button below to hide and write from memory.'}
+                    ? '다 외웠으면 아래 버튼을 눌러 주세요. 문구가 가려져요.'
+                    : 'When ready, tap the button below to hide it.'}
                 </p>
-
-                {/* Big Button to Hide and Start Writing from Memory */}
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={handleStartWriting}
-                    className="w-full sm:w-auto px-8 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 text-sm font-extrabold shadow-lg shadow-amber-500/25 transition-all flex items-center justify-center gap-2 mx-auto cursor-pointer"
-                  >
-                    <Lock className="w-4 h-4" />
-                    <span>{lang === 'ko' ? '🧠 기억 완료! 가리고 작성하기' : 'Memorized! Hide and Write'}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
               </div>
             )}
 
