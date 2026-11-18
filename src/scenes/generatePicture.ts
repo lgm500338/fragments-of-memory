@@ -142,8 +142,8 @@ export function generatePictureLevel(levelNumber: number): LevelData {
     difficultyTier: levelNumber <= 5 ? 'easy' : levelNumber <= 15 ? 'normal' : 'hard',
     observationTimeLimit: observeSec,
     storyNarrative: {
-      ko: `${scene.narrativeKo}\n물건 ${items.length}개가 숨어 있어요. 시간이 끝나면 모두 사라져요!`,
-      en: `${scene.narrativeEn}\n${items.length} objects are hidden here. They vanish when time is up!`,
+      ko: `이 그림에는 ${josa(items.map((it) => it.name.ko).join(', '), '이', '가')} 있어요. 어디에 있는지 잘 봐두세요.`,
+      en: `In this picture: ${items.map((it) => it.name.en.toLowerCase()).join(', ')}. Watch where each one is.`,
     },
     illustrationType: 'fairytale_cottage',
     sceneId: scene.id,
