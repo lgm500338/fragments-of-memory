@@ -155,7 +155,7 @@ export const SceneRenderer: React.FC<SceneRendererProps> = ({
             {/* 모바일: 얇은 띠 위에 제목 */}
             <div className="sm:hidden absolute inset-0 flex items-center justify-between gap-2 px-2.5 bg-black/25">
               <span className="shrink-0">{stripLeft}</span>
-              <span className="min-w-0 truncate text-white font-bold text-sm drop-shadow" style={{ fontFamily: '"Gowun Batang","Noto Serif KR",serif' }}>
+              <span className="min-w-0 truncate text-white font-black text-lg drop-shadow-md" style={{ fontFamily: '"Gowun Batang","Noto Serif KR",serif' }}>
                 {coverTitle || ''}
               </span>
               <span className="shrink-0">{stripRight}</span>

@@ -16,7 +16,6 @@ interface ResultModalProps {
 }
 
 const KO_COMPLIMENTS = [
-  '점점 더 똑똑해지고 있어요! 🧠',
   '당신은 몰랐을 거예요, 당신이 천재라는 사실을! ✨',
   '정말 멋지게 기억해냈어요! 👏',
   '두뇌의 기억 회로가 환하게 깨어났습니다! 🌟',
@@ -25,7 +24,6 @@ const KO_COMPLIMENTS = [
 ];
 
 const EN_COMPLIMENTS = [
-  'Your brain is getting sharper every moment! 🧠',
   'You probably didn’t know it, but you are a genius! ✨',
   'You recalled it so brilliantly! 👏',
   'Your memory neural network is wide awake! 🌟',
@@ -66,6 +64,8 @@ export const ResultModal: React.FC<ResultModalProps> = ({
   // Pick an encouraging compliment based on level number
   const complimentIndex = (level.levelNumber + results.length) % KO_COMPLIMENTS.length;
   const compliment = lang === 'ko' ? KO_COMPLIMENTS[complimentIndex] : EN_COMPLIMENTS[complimentIndex];
+  // 폭죽처럼 움직이는 응원 문구 (항상 같음)
+  const cheer = lang === 'ko' ? '점점 더 두뇌가 좋아지고 있어요!' : 'Your brain is getting better and better!';
 
   useEffect(() => {
     if (bookmarksEarned > 0) {
@@ -83,8 +83,8 @@ export const ResultModal: React.FC<ResultModalProps> = ({
         {/* 통과: 칭찬 글자가 폭죽처럼 터지며 나타남 / 실패: 다시 도전 아이콘 */}
         <div className="flex flex-col items-center">
           {isPassed ? (
-            <div className="relative py-4 w-full" aria-label={compliment}>
-              <div className="fw-sparks" aria-hidden="true">
+            <div className="relative py-2 w-full">
+              <div className="fw-sparks" style={{ top: '72%' }} aria-hidden="true">
                 {SPARKS.map((sp, i) => (
                   <i
                     key={i}
@@ -92,8 +92,9 @@ export const ResultModal: React.FC<ResultModalProps> = ({
                   />
                 ))}
               </div>
-              <h2 className="relative text-xl sm:text-2xl font-black text-white leading-snug break-keep" aria-hidden="true">
-                {Array.from(compliment).map((ch, i, arr) => {
+              <h2 className="relative text-xl sm:text-2xl font-black text-white leading-snug break-keep">{compliment}</h2>
+              <p className="relative mt-3 text-lg sm:text-xl font-black text-amber-300 leading-snug break-keep" aria-hidden="true">
+                {Array.from(cheer).map((ch, i, arr) => {
                   const a = (i / Math.max(1, arr.length - 1)) * Math.PI * 2;
                   return (
                     <span
@@ -110,7 +111,7 @@ export const ResultModal: React.FC<ResultModalProps> = ({
                     </span>
                   );
                 })}
-              </h2>
+              </p>
             </div>
           ) : (
             <>
