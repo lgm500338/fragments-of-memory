@@ -53,6 +53,11 @@ export default function App() {
   });
   const [isMuted, setIsMuted] = useState<boolean>(false);
 
+  // 브라우저 탭 이름
+  useEffect(() => {
+    document.title = lang === 'ko' ? '기억두뇌: 기억력 향상 두뇌 챌린지' : 'Memory Brain: Brain Challenge';
+  }, [lang]);
+
   // 기억동화·소설: 고른 작품과 작품별 진행
   const [selectedWork, setSelectedWork] = useState<string>(() => {
     try {

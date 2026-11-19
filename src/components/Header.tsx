@@ -72,7 +72,7 @@ export const Header: React.FC<HeaderProps> = ({
               isLight ? 'text-stone-900' : 'text-white'
             }`}
           >
-            {lang === 'ko' ? '기억의 조각' : 'Fragments'}
+            {lang === 'ko' ? '기억두뇌' : 'Memory Brain'}
           </span>
         </div>
 
